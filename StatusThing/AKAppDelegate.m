@@ -260,6 +260,99 @@
         position ++;
     }
     
+    
+    
+    // Separator
+    if (position > 0)
+    {
+        
+        if ([self.statusMenu itemWithTag: 1] == nil)
+        {
+            
+            // Preferences separator [NSMenuItem separatorItem]
+            NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
+            
+            [betweenItemsAndPreferences setTag: 1];
+            
+            [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
+            
+        }
+        
+        position++;
+        
+    } else {
+        
+        // Remove it
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 1];
+        if (removeIfExists != nil)
+        {
+            [self.statusMenu removeItem: removeIfExists];
+        }
+        
+    }
+    
+    if (self.smartHomeMonitorMode) {
+        
+        NSUInteger itemTag = 1000;
+        
+        // Does this item already exist?
+        NSMenuItem *itemMenuItem = [self.statusMenu itemWithTag: itemTag];
+
+        BOOL intruderDetected = NO;
+        for (NSDictionary *item in self.alarms) {
+            NSString *state = item[@"status"];
+            if ([state isEqualToString:@"alarm"] || [state isEqualToString:@"strobe"] || [state isEqualToString:@"both"]) {
+                intruderDetected = YES;
+            }
+        }
+        self.intruderDetected = intruderDetected;
+
+        // Create a new one if it doesn't exist
+        if (itemMenuItem == nil)
+        {
+            // Create the item
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: self.smartHomeMonitorMode.capitalizedString
+                                                      action: nil
+                                               keyEquivalent: @""];
+            
+            // Set the tag
+            [itemMenuItem setTag: itemTag];
+            
+            // Add the item
+            [self.statusMenu insertItem: itemMenuItem atIndex: position];
+        }
+        
+        // Set the on off status
+        if (intruderDetected)
+        {
+            [itemMenuItem setState: NSOnState];
+            [itemMenuItem setTitle: [NSString stringWithFormat:@"Intruder Detected!!!   (%@)", self.smartHomeMonitorMode.capitalizedString]];
+        } else {
+            [itemMenuItem setState: NSOffState];
+            [itemMenuItem setTitle:self.smartHomeMonitorMode.capitalizedString];
+        }
+        
+        // Move forward
+        position++;
+
+        if ([self.statusMenu itemWithTag: 2] == nil)
+        {
+            
+            // Preferences separator [NSMenuItem separatorItem]
+            NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
+            
+            [betweenItemsAndPreferences setTag: 2];
+            
+            [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
+            
+        }
+        
+        position++;
+
+    }
+    
+
+    
     // Items
     for (NSDictionary *item in self.items)
     {
@@ -299,17 +392,152 @@
     }
     
     // Separator
-    int betweenItemsAndPreferencesTag = 1;
-    if ([self.items count] > 0)
+    if ([self.items count] > 0 && position > 0)
+    {
+        
+        if ([self.statusMenu itemWithTag: 3] == nil)
+        {
+            
+            // Preferences separator [NSMenuItem separatorItem]
+            NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
+            
+            [betweenItemsAndPreferences setTag: 3];
+            
+            [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
+            
+        }
+        
+        position++;
+        
+    } else {
+        
+        // Remove it
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 3];
+        if (removeIfExists != nil)
+        {
+            [self.statusMenu removeItem: removeIfExists];
+        }
+        
+    }
+
+    // Items
+    for (NSDictionary *item in self.contactSensors)
+    {
+        
+        NSUInteger itemTag = (500 + [self.contactSensors indexOfObject: item]);
+        
+        // Does this item already exist?
+        NSMenuItem *itemMenuItem = [self.statusMenu itemWithTag: itemTag];
+        
+        // Create a new one if it doesn't exist
+        if (itemMenuItem == nil)
+        {
+            
+            // Create the item
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: item[@"label"]
+                                                      action: @selector(itemClick:)
+                                               keyEquivalent: @""];
+            
+            // Set the tag
+            [itemMenuItem setTag: itemTag];
+            
+            // Add the item
+            [self.statusMenu insertItem: itemMenuItem atIndex: position];
+        }
+        
+        // Set the on off status
+        if ([item[@"status"] isEqualToString: @"open"])
+        {
+            [itemMenuItem setState: NSOnState];
+        } else {
+            [itemMenuItem setState: NSOffState];
+        }
+        
+        // Move forward
+        position++;
+        
+    }
+
+    // Separator
+    if ([self.contactSensors count] > 0 && position > 0)
+    {
+        
+        if ([self.statusMenu itemWithTag: 4] == nil)
+        {
+            
+            // Preferences separator [NSMenuItem separatorItem]
+            NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
+            
+            [betweenItemsAndPreferences setTag: 4];
+            
+            [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
+            
+        }
+        
+        position++;
+        
+    } else {
+        
+        // Remove it
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 4];
+        if (removeIfExists != nil)
+        {
+            [self.statusMenu removeItem: removeIfExists];
+        }
+        
+    }
+
+    
+    // Items
+    for (NSDictionary *item in self.motionSensors)
+    {
+        
+        NSUInteger itemTag = (600 + [self.motionSensors indexOfObject: item]);
+        
+        // Does this item already exist?
+        NSMenuItem *itemMenuItem = [self.statusMenu itemWithTag: itemTag];
+        
+        // Create a new one if it doesn't exist
+        if (itemMenuItem == nil)
+        {
+            
+            // Create the item
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: item[@"label"]
+                                                      action: @selector(itemClick:)
+                                               keyEquivalent: @""];
+            
+            // Set the tag
+            [itemMenuItem setTag: itemTag];
+            
+            // Add the item
+            [self.statusMenu insertItem: itemMenuItem atIndex: position];
+        }
+        
+        // Set the on off status
+        if ([item[@"status"] isEqualToString: @"active"])
+        {
+            [itemMenuItem setState: NSOnState];
+        } else {
+            [itemMenuItem setState: NSOffState];
+        }
+        
+        // Move forward
+        position++;
+        
+    }
+
+    
+    // Separator
+    if ([self.motionSensors count] > 0 && position > 0)
     {
 
-        if ([self.statusMenu itemWithTag: betweenItemsAndPreferencesTag] == nil)
+        if ([self.statusMenu itemWithTag: 5] == nil)
         {
         
             // Preferences separator [NSMenuItem separatorItem]
             NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
             
-            [betweenItemsAndPreferences setTag: betweenItemsAndPreferencesTag];
+            [betweenItemsAndPreferences setTag: 5];
             
             [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
             
@@ -320,7 +548,7 @@
     } else {
         
         // Remove it
-        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: betweenItemsAndPreferencesTag];
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 5];
         if (removeIfExists != nil)
         {
             [self.statusMenu removeItem: removeIfExists];
@@ -329,7 +557,7 @@
     }
     
     // Preferences
-    int preferencesTag = 2;
+    int preferencesTag = 10;
     if ([self.statusMenu itemWithTag: preferencesTag] == nil)
     {
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle: @"Preferences..."
@@ -348,7 +576,7 @@
    
     
     // Quit Separator
-    int quitSeparatorTag = 3;
+    int quitSeparatorTag = 20;
     if ([self.statusMenu itemWithTag: quitSeparatorTag] == nil)
     {
         NSMenuItem *quitSeparator = [NSMenuItem separatorItem];
@@ -360,7 +588,7 @@
     position ++;
     
     // Quit
-    int quitTag = 4;
+    int quitTag = 30;
     if ([self.statusMenu itemWithTag: quitTag] == nil)
     {
         
@@ -396,6 +624,12 @@
         
         self.statusItemView.showIcon = YES;
         
+    }
+    
+    if (self.intruderDetected) {
+        self.statusItemView.alarmActive = YES;
+    } else {
+        self.statusItemView.alarmActive = NO;
     }
     
 }
@@ -594,6 +828,12 @@
 
     NSArray *items = json[@"items"];
     self.temperatures = json[@"temperatures"];
+    NSArray *contactSensors = json[@"contactSensors"];
+    NSArray *motionSensors = json[@"motionSensors"];
+    NSArray *alarm = json[@"alarm"];
+    NSArray *alarms = json[@"alarms"];
+    
+    NSLog(@"%@",alarms);
     
     NSMutableArray *allItems = [[NSMutableArray alloc] init];
     
@@ -606,8 +846,36 @@
         
     }
     
+    NSMutableArray *allContactSensors = [[NSMutableArray alloc] init];
+    for (NSDictionary *item in contactSensors) {
+        [allContactSensors addObject: @{ @"id"     : item[@"id"],
+                                         @"label"  : item[@"name"],
+                                         @"status" : item[@"state"] }];
+    }
+    NSMutableArray *allMotionSensors = [[NSMutableArray alloc] init];
+    for (NSDictionary *item in motionSensors) {
+        [allMotionSensors addObject: @{ @"id"     : item[@"id"],
+                                        @"label"  : item[@"name"],
+                                        @"status" : item[@"state"] }];
+    }
+    for (NSDictionary *item in alarm) {
+        NSString *name = item[@"name"];
+        if ([name isEqualToString:@"Alarm"]) {
+            self.smartHomeMonitorMode = item[@"state"];
+        }
+    }
+    NSMutableArray *allAlarms = [[NSMutableArray alloc] init];
+    for (NSDictionary *item in alarms) {
+        [allAlarms addObject: @{ @"id"     : item[@"id"],
+                                 @"label"  : item[@"name"],
+                                 @"status" : item[@"state"] }];
+    }
+    
     // Set items
     self.items = allItems;
+    self.contactSensors = allContactSensors;
+    self.motionSensors = allMotionSensors;
+    self.alarms = allAlarms;
     
     [self refreshPreferences];
     

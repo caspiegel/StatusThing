@@ -92,13 +92,18 @@
         textFormatting[NSForegroundColorAttributeName] = [NSColor whiteColor];
         
         // If the menu is open, then display our white/black scheme
-        if (self.menuIsVisible)
-        {
+        if (self.alarmActive) {
+            [[NSColor redColor] set];
             textFormatting[NSForegroundColorAttributeName] = [NSColor blackColor];
-            
-            [[NSColor whiteColor] set];
         } else {
-            [[NSColor blackColor] set];
+            if (self.menuIsVisible)
+            {
+                textFormatting[NSForegroundColorAttributeName] = [NSColor blackColor];
+                
+                [[NSColor whiteColor] set];
+            } else {
+                [[NSColor blackColor] set];
+            }
         }
         
         NSBezierPath *bg = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(3.0, 3.0, ([self frame].size.width - 6.0), 17)

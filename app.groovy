@@ -24,7 +24,9 @@ preferences {
         input "switches", "capability.switch", title : "Switches", multiple : true, required : true
         input "temperatures", "capability.temperatureMeasurement", title : "Temperature", multiple : true, required : false
         input "thermostats", "capability.thermostat", title : "Thermostats", multiple : true, required : false
-
+		input "contactSensors", "capability.contactSensor", title : "Doors and Windows", multiple : true, required : false
+        input "motionSensors", "capability.motionSensor", title : "Motion Sensors", multiple : true, required : false
+        input "alarms", "capability.alarm", title : "Alarms", multiple : true, required : false
     }
 }
 
@@ -54,6 +56,37 @@ def updateItemsAndTemperatures()
     for (item in switches)
     {
         items << [ 'id' : item.id , 'state' : item.currentValue('switch') ?: '' , 'name' : item.displayName ]
+    }
+    
+    def contactSensorItems = []
+    if (contactSensors)
+    {
+ 	    for (item in contactSensors)
+    	{
+    		contactSensorItems << [ 'id' : item.id , 'state' : item.currentValue('contact') ?: '' , 'name' : item.displayName ]
+    	}
+    }
+    
+    def motionSensorItems = []
+    if (motionSensors)
+    {
+    	for (item in motionSensors)
+        {
+        	motionSensorItems << [ 'id' : item.id , 'state' : item.currentValue('motion') ?: '' , 'name' : item.displayName ]
+        }
+    }
+    
+    def alarmState = []
+    alarmState << [ 'state' : location.currentValue('alarmSystemStatus') ?: '' , 'name' : 'Alarm' ]
+    
+    def alarmItems = []
+    if (alarms)
+    {
+    	for (item in alarms)
+        {
+        	log.debug item.currentValue('alarm')
+        	alarmItems << [ 'id' : item.id , 'state' : item.currentValue('alarm') ?: '' , 'name' : item.displayName ]
+        }
     }
 
     def temperatureItems = []
@@ -90,7 +123,7 @@ def updateItemsAndTemperatures()
         }
     }
 
-    [ 'temperatures' : temperatureItems , 'items' : items ]
+    [ 'temperatures' : temperatureItems , 'items' : items , 'contactSensors' : contactSensorItems, 'motionSensors' : motionSensorItems, 'alarm' : alarmState, 'alarms' : alarmItems ]
 
 }
 

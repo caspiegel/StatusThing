@@ -11,7 +11,8 @@
 
 @property (nonatomic) bool showIcon;
 @property bool menuIsVisible;
-@property (nonatomic) NSString *title; 
+@property (nonatomic) NSString *title;
+@property (nonatomic) bool alarmActive;
 
 @property NSTrackingArea *tracking;
 

@@ -18,8 +18,13 @@
 
 // State management
 @property NSMutableArray *items;
-@property NSMutableArray *temperatures; 
+@property NSMutableArray *contactSensors;
+@property NSMutableArray *motionSensors;
+@property NSMutableArray *temperatures;
 @property NSNumber *selectedTemperatureId;
+@property NSString *smartHomeMonitorMode;
+@property NSMutableArray *alarms;
+@property BOOL intruderDetected;
 
 @property bool updateFromServerInProgress;
 

@@ -1,0 +1,47 @@
+PODS:
+  - AKSmartThings (0.0.3):
+    - CocoaHTTPServer (~> 2.3)
+  - CocoaAsyncSocket (7.4.3):
+    - CocoaAsyncSocket/All (= 7.4.3)
+  - CocoaAsyncSocket/All (7.4.3):
+    - CocoaAsyncSocket/GCD
+    - CocoaAsyncSocket/RunLoop
+  - CocoaAsyncSocket/GCD (7.4.3)
+  - CocoaAsyncSocket/RunLoop (7.4.3)
+  - CocoaHTTPServer (2.3):
+    - CocoaAsyncSocket
+    - CocoaLumberjack
+  - CocoaLumberjack (2.3.0):
+    - CocoaLumberjack/Default (= 2.3.0)
+    - CocoaLumberjack/Extensions (= 2.3.0)
+  - CocoaLumberjack/Core (2.3.0)
+  - CocoaLumberjack/Default (2.3.0):
+    - CocoaLumberjack/Core
+  - CocoaLumberjack/Extensions (2.3.0):
+    - CocoaLumberjack/Default
+  - FXKeychain (1.5.3)
+
+DEPENDENCIES:
+  - AKSmartThings (from `https://github.com/alexking/AKSmartThings.git`)
+  - CocoaHTTPServer (~> 2.3)
+  - FXKeychain (~> 1.4)
+
+EXTERNAL SOURCES:
+  AKSmartThings:
+    :git: https://github.com/alexking/AKSmartThings.git
+
+CHECKOUT OPTIONS:
+  AKSmartThings:
+    :commit: 9e8e55c36261a7978a585a31a77764f22d9913bf
+    :git: https://github.com/alexking/AKSmartThings.git
+
+SPEC CHECKSUMS:
+  AKSmartThings: 443e56d7a64aac9da35f9598e3092f1b4527a75a
+  CocoaAsyncSocket: a18c75dca4b08723628a0bacca6e94803d90be91
+  CocoaHTTPServer: 5624681fc3473d43b18202f635f9b3abb013b530
+  CocoaLumberjack: 97fab7ee5f507fe54445cca7ea80f926729cfd15
+  FXKeychain: 2fe54573946ffef634f4e2a2851e6c8f4ea15e76
+
+PODFILE CHECKSUM: 7084dcdd626ffeb4c30e125a7253cbad12819711
+
+COCOAPODS: 1.0.1
