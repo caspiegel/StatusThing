@@ -218,6 +218,10 @@
     // Keep track of where we are, move forward when we
     // create an item or confirm an item exists
     NSUInteger position = 0;
+    NSUInteger separatorTag = 0; // separators start at 0
+    BOOL showSeparator = false;
+    
+     
     
     // If we're not showing the temperature in the status bar, show it in the menu
     if (![self.settings showTemperatureInStatusBar] && [self temperaturesForDisplay] != nil)
@@ -225,7 +229,7 @@
         NSArray *temperatures = [self temperaturesForDisplay];
         for (NSDictionary *temperature in temperatures) {
             
-            NSUInteger temperatureTag = 200 + [temperatures indexOfObject: temperature];
+            NSUInteger temperatureTag = 100 + [temperatures indexOfObject: temperature];
             
             // Find a possible item
             NSMenuItem *temperatureItem = [self.statusMenu itemWithTag: temperatureTag];
@@ -256,34 +260,39 @@
         }
         
         
-        [self statusMenuSeparatorItemWithTag: 300 atPosition: position shouldExist: YES];
         position ++;
+        showSeparator = true;
     }
     
     
     
+     
+
+    
+    
     // Separator
-    if (position > 0)
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
     {
-        
-        if ([self.statusMenu itemWithTag: 1] == nil)
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
         {
             
             // Preferences separator [NSMenuItem separatorItem]
             NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
             
-            [betweenItemsAndPreferences setTag: 1];
+            [betweenItemsAndPreferences setTag: separatorTag];
             
             [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
             
         }
         
         position++;
+        showSeparator = false;
         
     } else {
         
         // Remove it
-        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 1];
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
         if (removeIfExists != nil)
         {
             [self.statusMenu removeItem: removeIfExists];
@@ -291,9 +300,16 @@
         
     }
     
+    
+    
+     
+
+    
+    
+    // Smart Home Monitor
     if (self.smartHomeMonitorMode) {
         
-        NSUInteger itemTag = 1000;
+        NSUInteger itemTag = 200;
         
         // Does this item already exist?
         NSMenuItem *itemMenuItem = [self.statusMenu itemWithTag: itemTag];
@@ -312,7 +328,7 @@
         {
             // Create the item
             itemMenuItem = [[NSMenuItem alloc] initWithTitle: self.smartHomeMonitorMode.capitalizedString
-                                                      action: nil
+                                                      action: @selector(itemClick:)
                                                keyEquivalent: @""];
             
             // Set the tag
@@ -334,30 +350,55 @@
         
         // Move forward
         position++;
+        showSeparator = true;
+    }
+    
 
-        if ([self.statusMenu itemWithTag: 2] == nil)
+     
+
+    
+    
+    // Separator
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
+    {
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
         {
             
             // Preferences separator [NSMenuItem separatorItem]
             NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
             
-            [betweenItemsAndPreferences setTag: 2];
+            [betweenItemsAndPreferences setTag: separatorTag];
             
             [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
             
         }
         
         position++;
-
+        showSeparator = false;
+        
+    } else {
+        
+        // Remove it
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
+        if (removeIfExists != nil)
+        {
+            [self.statusMenu removeItem: removeIfExists];
+        }
+        
     }
-    
 
     
-    // Items
-    for (NSDictionary *item in self.items)
+    
+     
+
+    
+    
+    // Smoke Detectors
+    for (NSDictionary *item in self.smokeDetectors)
     {
         
-        NSUInteger itemTag = (100 + [self.items indexOfObject: item]);
+        NSUInteger itemTag = (300 + [self.smokeDetectors indexOfObject: item]);
         
         // Does this item already exist?
         NSMenuItem *itemMenuItem = [self.statusMenu itemWithTag: itemTag];
@@ -365,9 +406,184 @@
         // Create a new one if it doesn't exist
         if (itemMenuItem == nil)
         {
+            NSString *title = [NSString stringWithFormat:@"\t\t\t%@", item[@"label"]];
+            NSString *batt = item[@"battery"];
+            if (batt) {
+                title = [NSString stringWithFormat:@"\t(%@%%)\t%@", batt, item[@"label"]];
+            }
+            
+            title = [NSString stringWithFormat:@"%@\t(%@)",title,item[@"smoke"]];
             
             // Create the item
-            itemMenuItem = [[NSMenuItem alloc] initWithTitle: item[@"label"]
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: title
+                                                      action: @selector(itemClick:)
+                                               keyEquivalent: @""];
+            
+            // Set the tag
+            [itemMenuItem setTag: itemTag];
+            
+            // Add the item
+            [self.statusMenu insertItem: itemMenuItem atIndex: position];
+        }
+        
+        // Set the on off status
+        if ([item[@"alarmState"] isEqualToString: @"detected"])
+        {
+            [itemMenuItem setState: NSOnState];
+        } else {
+            [itemMenuItem setState: NSOffState];
+        }
+        
+        // Move forward
+        position++;
+        showSeparator = true;
+    }
+    
+    
+     
+
+    
+    
+    
+    // Separator
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
+    {
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
+        {
+            
+            // Preferences separator [NSMenuItem separatorItem]
+            NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
+            
+            [betweenItemsAndPreferences setTag: separatorTag];
+            
+            [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
+            
+        }
+        
+        position++;
+        showSeparator = false;
+        
+    } else {
+        
+        // Remove it
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
+        if (removeIfExists != nil)
+        {
+            [self.statusMenu removeItem: removeIfExists];
+        }
+        
+    }
+
+     
+
+    
+    // Water Sensors
+    for (NSDictionary *item in self.waterSensors)
+    {
+        
+        NSUInteger itemTag = (350 + [self.waterSensors indexOfObject: item]);
+        
+        // Does this item already exist?
+        NSMenuItem *itemMenuItem = [self.statusMenu itemWithTag: itemTag];
+        
+        // Create a new one if it doesn't exist
+        if (itemMenuItem == nil)
+        {
+            NSString *title = [NSString stringWithFormat:@"\t\t\t%@", item[@"label"]];
+            NSString *batt = item[@"battery"];
+            if (batt) {
+                title = [NSString stringWithFormat:@"\t(%@%%)\t%@", batt, item[@"label"]];
+            }
+            
+            title = [NSString stringWithFormat:@"%@\t\t(%@)",title,item[@"status"]];
+            
+            // Create the item
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: title
+                                                      action: @selector(itemClick:)
+                                               keyEquivalent: @""];
+            
+            // Set the tag
+            [itemMenuItem setTag: itemTag];
+            
+            // Add the item
+            [self.statusMenu insertItem: itemMenuItem atIndex: position];
+        }
+        
+        // Set the on off status
+        if ([item[@"status"] isEqualToString: @"wet"])
+        {
+            [itemMenuItem setState: NSOnState];
+        } else {
+            [itemMenuItem setState: NSOffState];
+        }
+        
+        // Move forward
+        position++;
+        showSeparator = true;
+    }
+    
+    
+    
+     
+
+    
+    
+    // Separator
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
+    {
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
+        {
+            
+            // Preferences separator [NSMenuItem separatorItem]
+            NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
+            
+            [betweenItemsAndPreferences setTag: separatorTag];
+            
+            [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
+            
+        }
+        
+        position++;
+        showSeparator = false;
+        
+    } else {
+        
+        // Remove it
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
+        if (removeIfExists != nil)
+        {
+            [self.statusMenu removeItem: removeIfExists];
+        }
+        
+    }
+    
+    
+     
+
+    
+    
+    // Items
+    for (NSDictionary *item in self.items)
+    {
+        
+        NSUInteger itemTag = (400 + [self.items indexOfObject: item]);
+        
+        // Does this item already exist?
+        NSMenuItem *itemMenuItem = [self.statusMenu itemWithTag: itemTag];
+        
+        // Create a new one if it doesn't exist
+        if (itemMenuItem == nil)
+        {
+            NSString *title = [NSString stringWithFormat:@"\t\t\t%@", item[@"label"]];
+            NSString *batt = item[@"battery"];
+            if (batt) {
+                title = [NSString stringWithFormat:@"\t(%@%%)\t%@", batt, item[@"label"]];
+            }
+            
+            // Create the item
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: title
                                                       action: @selector(itemClick:)
                                                keyEquivalent: @""];
             
@@ -388,37 +604,50 @@
         
         // Move forward
         position++;
-        
+        showSeparator = true;
     }
     
+    
+    
+     
+
+    
+    
     // Separator
-    if ([self.items count] > 0 && position > 0)
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
     {
-        
-        if ([self.statusMenu itemWithTag: 3] == nil)
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
         {
             
             // Preferences separator [NSMenuItem separatorItem]
             NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
             
-            [betweenItemsAndPreferences setTag: 3];
+            [betweenItemsAndPreferences setTag: separatorTag];
             
             [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
             
         }
         
         position++;
+        showSeparator = false;
         
     } else {
         
         // Remove it
-        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 3];
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
         if (removeIfExists != nil)
         {
             [self.statusMenu removeItem: removeIfExists];
         }
         
     }
+
+    
+     
+
+    
+    
 
     // Items
     for (NSDictionary *item in self.contactSensors)
@@ -432,9 +661,14 @@
         // Create a new one if it doesn't exist
         if (itemMenuItem == nil)
         {
+            NSString *title = [NSString stringWithFormat:@"\t\t\t%@", item[@"label"]];
+            NSString *batt = item[@"battery"];
+            if (batt) {
+                title = [NSString stringWithFormat:@"\t(%@%%)\t%@", batt, item[@"label"]];
+            }
             
             // Create the item
-            itemMenuItem = [[NSMenuItem alloc] initWithTitle: item[@"label"]
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: title
                                                       action: @selector(itemClick:)
                                                keyEquivalent: @""];
             
@@ -455,37 +689,49 @@
         
         // Move forward
         position++;
-        
+        showSeparator = true;
     }
 
+   
+     
+
+    
+    
     // Separator
-    if ([self.contactSensors count] > 0 && position > 0)
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
     {
-        
-        if ([self.statusMenu itemWithTag: 4] == nil)
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
         {
             
             // Preferences separator [NSMenuItem separatorItem]
             NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
             
-            [betweenItemsAndPreferences setTag: 4];
+            [betweenItemsAndPreferences setTag: separatorTag];
             
             [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
             
         }
         
         position++;
+        showSeparator = false;
         
     } else {
         
         // Remove it
-        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 4];
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
         if (removeIfExists != nil)
         {
             [self.statusMenu removeItem: removeIfExists];
         }
         
     }
+
+    
+    
+     
+
+    
 
     
     // Items
@@ -500,9 +746,14 @@
         // Create a new one if it doesn't exist
         if (itemMenuItem == nil)
         {
+            NSString *title = [NSString stringWithFormat:@"\t\t\t%@", item[@"label"]];
+            NSString *batt = item[@"battery"];
+            if (batt) {
+                title = [NSString stringWithFormat:@"\t(%@%%)\t%@", batt, item[@"label"]];
+            }
             
             // Create the item
-            itemMenuItem = [[NSMenuItem alloc] initWithTitle: item[@"label"]
+            itemMenuItem = [[NSMenuItem alloc] initWithTitle: title
                                                       action: @selector(itemClick:)
                                                keyEquivalent: @""];
             
@@ -523,41 +774,50 @@
         
         // Move forward
         position++;
-        
+        showSeparator = true;
     }
+    
+     
 
     
+    
+    
     // Separator
-    if ([self.motionSensors count] > 0 && position > 0)
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
     {
-
-        if ([self.statusMenu itemWithTag: 5] == nil)
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
         {
-        
+            
             // Preferences separator [NSMenuItem separatorItem]
             NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
             
-            [betweenItemsAndPreferences setTag: 5];
+            [betweenItemsAndPreferences setTag: separatorTag];
             
             [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
             
         }
-            
+        
         position++;
+        showSeparator = false;
         
     } else {
         
         // Remove it
-        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: 5];
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
         if (removeIfExists != nil)
         {
             [self.statusMenu removeItem: removeIfExists];
         }
         
     }
+
+
+
+
     
     // Preferences
-    int preferencesTag = 10;
+    int preferencesTag = 1000;
     if ([self.statusMenu itemWithTag: preferencesTag] == nil)
     {
         NSMenuItem *item = [[NSMenuItem alloc] initWithTitle: @"Preferences..."
@@ -573,22 +833,48 @@
     }
     
     position ++;
-   
+    showSeparator = true;
     
-    // Quit Separator
-    int quitSeparatorTag = 20;
-    if ([self.statusMenu itemWithTag: quitSeparatorTag] == nil)
+
+
+    
+    
+    // Separator
+    separatorTag += 1;
+    if (showSeparator) // only show it if we've already added something
     {
-        NSMenuItem *quitSeparator = [NSMenuItem separatorItem];
-        [quitSeparator setTag: quitSeparatorTag];
+        if ([self.statusMenu itemWithTag: separatorTag] == nil)
+        {
+            
+            // Preferences separator [NSMenuItem separatorItem]
+            NSMenuItem *betweenItemsAndPreferences = [NSMenuItem separatorItem];
+            
+            [betweenItemsAndPreferences setTag: separatorTag];
+            
+            [self.statusMenu insertItem: betweenItemsAndPreferences atIndex: position];
+            
+        }
         
-        [self.statusMenu insertItem: quitSeparator atIndex: position];
+        position++;
+        showSeparator = false;
+        
+    } else {
+        
+        // Remove it
+        NSMenuItem *removeIfExists = [self.statusMenu itemWithTag: separatorTag];
+        if (removeIfExists != nil)
+        {
+            [self.statusMenu removeItem: removeIfExists];
+        }
+        
     }
-  
-    position ++;
+
+    
+
+    
     
     // Quit
-    int quitTag = 30;
+    int quitTag = 2000;
     if ([self.statusMenu itemWithTag: quitTag] == nil)
     {
         
@@ -607,6 +893,8 @@
 
 
 }
+
+
 
 
 - (void) refreshStatusItem
@@ -826,18 +1114,13 @@
 
     self.updateFromServerInProgress = NO;
 
-    NSArray *items = json[@"items"];
     self.temperatures = json[@"temperatures"];
-    NSArray *contactSensors = json[@"contactSensors"];
-    NSArray *motionSensors = json[@"motionSensors"];
-    NSArray *alarm = json[@"alarm"];
-    NSArray *alarms = json[@"alarms"];
     
-    NSLog(@"%@",alarms);
+//    [self debugFound:json];
     
+    // Lights
     NSMutableArray *allItems = [[NSMutableArray alloc] init];
-    
-    for (NSDictionary *item in items) {
+    for (NSDictionary *item in json[@"items"]) {
 
         // Save the items for building menus later
         [allItems addObject: @{ @"id"     : item[@"id"],
@@ -845,37 +1128,64 @@
                                 @"status" : item[@"state"] }];
         
     }
+    self.items = allItems;
     
+    // Contact Sensors (Doors and Windows)
     NSMutableArray *allContactSensors = [[NSMutableArray alloc] init];
-    for (NSDictionary *item in contactSensors) {
+    for (NSDictionary *item in json[@"contactSensors"]) {
         [allContactSensors addObject: @{ @"id"     : item[@"id"],
                                          @"label"  : item[@"name"],
                                          @"status" : item[@"state"] }];
     }
+    self.contactSensors = allContactSensors;
+
+    // Motion Sensors
     NSMutableArray *allMotionSensors = [[NSMutableArray alloc] init];
-    for (NSDictionary *item in motionSensors) {
+    for (NSDictionary *item in json[@"motionSensors"]) {
         [allMotionSensors addObject: @{ @"id"     : item[@"id"],
                                         @"label"  : item[@"name"],
+                                        @"battery": item[@"battery"],
                                         @"status" : item[@"state"] }];
     }
-    for (NSDictionary *item in alarm) {
+    self.motionSensors = allMotionSensors;
+    
+    // SHM Smart Home Monitor Mode (Disarm/Away/Home)
+    for (NSDictionary *item in json[@"alarm"]) {
         NSString *name = item[@"name"];
         if ([name isEqualToString:@"Alarm"]) {
             self.smartHomeMonitorMode = item[@"state"];
         }
     }
+    
+    // Alarms (Sirens)
     NSMutableArray *allAlarms = [[NSMutableArray alloc] init];
-    for (NSDictionary *item in alarms) {
+    for (NSDictionary *item in json[@"alarms"]) {
         [allAlarms addObject: @{ @"id"     : item[@"id"],
                                  @"label"  : item[@"name"],
                                  @"status" : item[@"state"] }];
     }
-    
-    // Set items
-    self.items = allItems;
-    self.contactSensors = allContactSensors;
-    self.motionSensors = allMotionSensors;
     self.alarms = allAlarms;
+    
+    // Water Sensors
+    NSMutableArray *allWaterSensors = [[NSMutableArray alloc] init];
+    for (NSDictionary *item in json[@"waterSensors"]) {
+        [allWaterSensors addObject: @{ @"id"     : item[@"id"],
+                                       @"label"  : item[@"name"],
+                                       @"battery": item[@"battery"],
+                                       @"status" : item[@"state"] }];
+    }
+    self.waterSensors = allWaterSensors;
+    
+    // Smoke Detectors
+    NSMutableArray *allSmokeDetectors = [[NSMutableArray alloc] init];
+    for (NSDictionary *item in json[@"smokeDetectors"]) {
+        [allSmokeDetectors addObject: @{ @"id"        : item[@"id"],
+                                         @"label"     : item[@"name"],
+                                         @"battery"   : item[@"battery"],
+                                         @"alarmState": item[@"alarmState"],
+                                         @"smoke"     : item[@"smoke"] }];
+    }
+    self.smokeDetectors = allSmokeDetectors;
     
     [self refreshPreferences];
     
@@ -893,7 +1203,14 @@
         return;
     }
     
-    NSDictionary *item = (self.items)[([sender tag] - 100)];
+    NSInteger index = [sender tag] - 400;
+    if (index < 0) {
+        return;
+    }
+    if (index > self.items.count) {
+        return ;
+    }
+    NSDictionary *item = (self.items)[index];
 
     // Find the item ID
     NSString *itemId = item[@"id"];

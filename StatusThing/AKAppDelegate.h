@@ -20,6 +20,8 @@
 @property NSMutableArray *items;
 @property NSMutableArray *contactSensors;
 @property NSMutableArray *motionSensors;
+@property NSMutableArray *waterSensors;
+@property NSMutableArray *smokeDetectors;
 @property NSMutableArray *temperatures;
 @property NSNumber *selectedTemperatureId;
 @property NSString *smartHomeMonitorMode;

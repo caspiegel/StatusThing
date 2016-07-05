@@ -27,6 +27,8 @@ preferences {
 		input "contactSensors", "capability.contactSensor", title : "Doors and Windows", multiple : true, required : false
         input "motionSensors", "capability.motionSensor", title : "Motion Sensors", multiple : true, required : false
         input "alarms", "capability.alarm", title : "Alarms", multiple : true, required : false
+        input "waterSensors", "capability.waterSensor", title : "Water Sensors", multiple : true, required : false
+        input "smokeDetectors", "capability.smokeDetector", title : "Smoke Detectors", multiple : true, required : false
     }
 }
 
@@ -72,7 +74,7 @@ def updateItemsAndTemperatures()
     {
     	for (item in motionSensors)
         {
-        	motionSensorItems << [ 'id' : item.id , 'state' : item.currentValue('motion') ?: '' , 'name' : item.displayName ]
+        	motionSensorItems << [ 'id' : item.id , 'state' : item.currentValue('motion') ?: '' , 'battery' : item.currentValue('battery') ?: '' , 'name' : item.displayName ]
         }
     }
     
@@ -84,8 +86,25 @@ def updateItemsAndTemperatures()
     {
     	for (item in alarms)
         {
-        	log.debug item.currentValue('alarm')
         	alarmItems << [ 'id' : item.id , 'state' : item.currentValue('alarm') ?: '' , 'name' : item.displayName ]
+        }
+    }
+    
+    def waterSensorItems = []
+    if (waterSensors)
+    {
+    	for (item in waterSensors)
+        {
+        	waterSensorItems << [ 'id' : item.id , 'state' : item.currentValue('water') ?: '' , 'battery' : item.currentValue('battery') ?: '' , 'name' : item.displayName ]
+        }
+    }
+    
+    def smokeDetectorItems = []
+    if (smokeDetectors)
+    {
+    	for (item in smokeDetectors)
+        {
+        	smokeDetectorItems << [ 'id' : item.id , 'smoke' : item.currentValue('smoke') ?: '' , 'battery' : item.currentValue('battery') ?: '' , 'alarmState' : item.currentValue('alarmState') ?: '' , 'name' : item.displayName ]
         }
     }
 
@@ -123,7 +142,7 @@ def updateItemsAndTemperatures()
         }
     }
 
-    [ 'temperatures' : temperatureItems , 'items' : items , 'contactSensors' : contactSensorItems, 'motionSensors' : motionSensorItems, 'alarm' : alarmState, 'alarms' : alarmItems ]
+    [ 'temperatures' : temperatureItems , 'items' : items , 'contactSensors' : contactSensorItems, 'motionSensors' : motionSensorItems, 'alarm' : alarmState, 'alarms' : alarmItems, 'waterSensors' : waterSensorItems , 'smokeDetectors' : smokeDetectorItems ]
 
 }
 
