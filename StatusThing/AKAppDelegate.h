@@ -17,15 +17,15 @@
 @property (strong) AKStatusItemView *statusItemView; 
 
 // State management
-@property NSMutableArray *items;
-@property NSMutableArray *contactSensors;
-@property NSMutableArray *motionSensors;
-@property NSMutableArray *waterSensors;
-@property NSMutableArray *smokeDetectors;
-@property NSMutableArray *temperatures;
+@property NSArray *items;
+@property NSArray *contactSensors;
+@property NSArray *motionSensors;
+@property NSArray *waterSensors;
+@property NSArray *smokeDetectors;
+@property NSArray *temperatures;
 @property NSNumber *selectedTemperatureId;
 @property NSString *smartHomeMonitorMode;
-@property NSMutableArray *alarms;
+@property NSArray *alarms;
 @property BOOL intruderDetected;
 
 @property bool updateFromServerInProgress;

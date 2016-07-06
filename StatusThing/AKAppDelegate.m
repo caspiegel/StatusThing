@@ -1128,7 +1128,11 @@
                                 @"status" : item[@"state"] }];
         
     }
-    self.items = allItems;
+    self.items = [allItems sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSString *first = a[@"label"];
+        NSString *second = b[@"label"];
+        return [first compare:second];
+    }];
     
     // Contact Sensors (Doors and Windows)
     NSMutableArray *allContactSensors = [[NSMutableArray alloc] init];
@@ -1137,7 +1141,12 @@
                                          @"label"  : item[@"name"],
                                          @"status" : item[@"state"] }];
     }
-    self.contactSensors = allContactSensors;
+    self.contactSensors = [allContactSensors sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSString *first = a[@"label"];
+        NSString *second = b[@"label"];
+        return [first compare:second];
+    }];
+
 
     // Motion Sensors
     NSMutableArray *allMotionSensors = [[NSMutableArray alloc] init];
@@ -1147,7 +1156,11 @@
                                         @"battery": item[@"battery"],
                                         @"status" : item[@"state"] }];
     }
-    self.motionSensors = allMotionSensors;
+    self.motionSensors = [allMotionSensors sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSString *first = a[@"label"];
+        NSString *second = b[@"label"];
+        return [first compare:second];
+    }];
     
     // SHM Smart Home Monitor Mode (Disarm/Away/Home)
     for (NSDictionary *item in json[@"alarm"]) {
@@ -1164,7 +1177,11 @@
                                  @"label"  : item[@"name"],
                                  @"status" : item[@"state"] }];
     }
-    self.alarms = allAlarms;
+    self.alarms = [allAlarms sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSString *first = a[@"label"];
+        NSString *second = b[@"label"];
+        return [first compare:second];
+    }];
     
     // Water Sensors
     NSMutableArray *allWaterSensors = [[NSMutableArray alloc] init];
@@ -1174,7 +1191,11 @@
                                        @"battery": item[@"battery"],
                                        @"status" : item[@"state"] }];
     }
-    self.waterSensors = allWaterSensors;
+    self.waterSensors = [allWaterSensors sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSString *first = a[@"label"];
+        NSString *second = b[@"label"];
+        return [first compare:second];
+    }];
     
     // Smoke Detectors
     NSMutableArray *allSmokeDetectors = [[NSMutableArray alloc] init];
@@ -1185,7 +1206,11 @@
                                          @"alarmState": item[@"alarmState"],
                                          @"smoke"     : item[@"smoke"] }];
     }
-    self.smokeDetectors = allSmokeDetectors;
+    self.smokeDetectors = [allSmokeDetectors sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSString *first = a[@"label"];
+        NSString *second = b[@"label"];
+        return [first compare:second];
+    }];
     
     [self refreshPreferences];
     
